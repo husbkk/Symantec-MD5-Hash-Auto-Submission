@@ -20,5 +20,5 @@ There are 2 ways to run this program.
    execute jar file.
    
    Commands for (2):
-   "cd <filepath>"
-   "java -jar <filename>"
+   "cd filepath"
+   "java -jar filename"
