@@ -4,7 +4,7 @@ This program created after my resignation at HKBEA aims to help colleagues in De
 Its purpose is to fill in the form on the Synmantec website for the suspected infected file examination request and to retrieve the corresponding tracking number automatically.
 
 
-This hardcoded program only works on the website: Symantec - Upload a suspected infected file (BCS)
+This hardcoded program only works on the website: Symantec - Upload a suspected infected file (BCS).
 URL: https://submit.symantec.com/websubmit/bcs.cgi
 
 
