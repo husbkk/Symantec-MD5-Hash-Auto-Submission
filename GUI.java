@@ -32,15 +32,18 @@ class MyFrame
     private JButton copy;
     private JButton sub;
     private JButton reset;
+    private JButton setHash;
     private JTextArea tout;
-    private JTextArea type;
     private String[] allResult = null;
     private JProgressBar progressBar;
     private int sentCount = 0;
+    private String[] hashList = null;
+    private HashImporter hashImporter;
+//    private ProgressIn
 
     public MyFrame() {
         setTitle("MD5 Auto Submission Bot");
-        setBounds(300, 90, 680, 460);
+        setBounds(300, 90, 680, 330);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
@@ -127,35 +130,42 @@ class MyFrame
         tseverity.setLocation(130, 200);
         c.add(tseverity);
 
+        setHash = new JButton("Import Hash");
+        setHash.setFont(new Font("Arial", Font.PLAIN, 14));
+        setHash.setSize(145, 20);
+        setHash.setLocation(30, 240);
+        setHash.addActionListener(this);
+        c.add(setHash);
+
         copy = new JButton("Copy Result");
         copy.setFont(new Font("Arial", Font.PLAIN, 14));
         copy.setSize(145, 20);
-        copy.setLocation(185, 200);
+        copy.setLocation(185, 240); //185 230
         copy.addActionListener(this);
-        copy.setVisible(false);
+//        copy.setVisible(false);
+        copy.setEnabled(false);
         c.add(copy);
 
         sub = new JButton("Submit");
         sub.setFont(new Font("Arial", Font.PLAIN, 14));
         sub.setSize(145, 20);
-        sub.setLocation(30, 230);
+        sub.setLocation(30, 270);       //30 260
         sub.addActionListener(this);
         c.add(sub);
 
         reset = new JButton("Reset");
         reset.setFont(new Font("Arial", Font.PLAIN, 14));
         reset.setSize(145, 20);
-        reset.setLocation(185, 230);
+        reset.setLocation(185, 270);
         reset.addActionListener(this);
         c.add(reset);
-
 
         tout = new JTextArea();
         tout.setFont(new Font("Arial", Font.PLAIN, 15));
         tout.setLineWrap(true);
         tout.setEditable(false);
         JScrollPane outputScroll = new JScrollPane(tout);
-        outputScroll.setBounds(350,50, 300, 370);   //350,20,300,400
+        outputScroll.setBounds(350,20, 300, 273);   //350,20,300,400 (243)
         outputScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 //        tout.setSize(300, 400);
 //        tout.setLocation(500, 100);
@@ -163,29 +173,13 @@ class MyFrame
 //        tout.setEditable(false);
         c.add(outputScroll);
 
-
-        type = new JTextArea();
-        type.setFont(new Font("Arial", Font.PLAIN, 14));
-        type.setLineWrap(true);
-//        type.setSize(200,100);
-//        type.setLocation(30,300);
-        JScrollPane inputScroll = new JScrollPane(type);
-        inputScroll.setBounds(30, 260, 301, 160);       //switch line would go double for width 300.
-        inputScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        c.add(inputScroll);
-
-//        JLabel author = new JLabel("Written by Kao");
-//        author.setFont(new Font("Arial", Font.PLAIN, 10));
-//        author.setSize(100, 12);
-//        author.setLocation(582, 423);
-//        c.add(author);
-
         progressBar = new JProgressBar();
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
         progressBar.setBounds(350,20,300,20);
+        c.add(progressBar);
 
-//        c.add(progressBar);
+        hashImporter = new HashImporter();
 
         setVisible(true);
     }
@@ -197,7 +191,7 @@ class MyFrame
                 && !tlname.getText().isEmpty()
                 && !tcname.getText().isEmpty()
                 && !tsid.getText().isEmpty()
-                && !type.getText().isEmpty()
+                && hashList[0] != null
                 && emailIsValid)
             return true;
         return false;
@@ -252,7 +246,7 @@ class MyFrame
             temail.setEditable(status);
             tsid.setEditable(status);
             tseverity.setEnabled(status);
-            type.setEditable(status);
+//            type.setEditable(status);
     }
 
     public void resultToClipboard(String[] arr) {
@@ -267,10 +261,9 @@ class MyFrame
         temail.setText(clear);
         tlname.setText(clear);
         tsid.setText(clear);
-        type.setText(clear);
-        type.setEditable(true);
         tout.setText(clear);
         tseverity.setSelected(false);
+        hashImporter.reset();
     }
 
     public int getSentCount() {
@@ -286,107 +279,200 @@ class MyFrame
     }
 
     public void actionPerformed(ActionEvent event) {
-        String typeInput = type.getText();
-        String[] hashList = typeInput.split("\\n");
-        String[] trackingNumber = new String[hashList.length];
+        String[] trackingNumber;
+
         String nextPageContent;
 
         if (event.getSource() == sub) {
+            //TESTING
+//            long startTime = System.nanoTime();
+            //
             changeFieldStatus(false);
 //            initiateProgress();
 
-            //TESTING
-
-            //
-
+            hashList = hashImporter.getHash();
+            trackingNumber =  new String[hashList.length];
             if (formIsValid()) {
 //                System.out.println("Programme Running. Please Wait.");
-
-                for (int i = 0; i < hashList.length; i++) {
+//                for (int i = 0; i < hashList.length; i++) {
 //                    System.out.println(getFormInfo());
 
-                    HtmlPage htmlPage = retrievePage("https://submit.symantec.com/websubmit/bcs.cgi");
+                    final HtmlPage htmlPage = retrievePage("https://submit.symantec.com/websubmit/bcs.cgi");
 
                     //Get HTML elements
-                    final HtmlForm form = htmlPage.getFormByName("appform");
-                    final HtmlTextInput _firstName = form.getInputByName("fname");
-                    final HtmlTextInput _lastName = form.getInputByName("lname");
-                    final HtmlTextInput _companyName = form.getInputByName("cname");
-                    final HtmlTextInput _email = form.getInputByName("email");
-                    final HtmlTextInput _email2 = form.getInputByName("email2");        //confirmation email
-                    final HtmlTextInput _pin = form.getInputByName("pin");
-                    final HtmlSelect _stype = form.getSelectByName("stype");
-                    final HtmlTextInput _hash = form.getInputByName("hash");
-                    final HtmlCheckBoxInput _severity = form.getInputByName("critical");
-                    final HtmlSubmitInput submit = form.getInputByValue("Submit");
+                    final HtmlForm FORM = htmlPage.getFormByName("appform");
+                    final HtmlTextInput FIRST_NAME = FORM.getInputByName("fname");
+                    final HtmlTextInput LAST_NAME = FORM.getInputByName("lname");
+                    final HtmlTextInput COMPANY_NAME = FORM.getInputByName("cname");
+                    final HtmlTextInput EMAIL = FORM.getInputByName("email");
+                    final HtmlTextInput EMAIL2 = FORM.getInputByName("email2");        //confirmation email
+                    final HtmlTextInput PIN = FORM.getInputByName("pin");
+                    final HtmlSelect TYPE = FORM.getSelectByName("stype");
+                    final HtmlTextInput HASH = FORM.getInputByName("hash");
+                    final HtmlCheckBoxInput SEVERITY = FORM.getInputByName("critical");
+                    final HtmlSubmitInput SUBMIT = FORM.getInputByValue("Submit");
 
                     //Set value to fields of website accordingly
-                    _firstName.setValueAttribute(tfname.getText());
-                    _lastName.setValueAttribute(tlname.getText());
-                    _companyName.setValueAttribute(tcname.getText());
-                    _email.setValueAttribute(temail.getText());
-                    _email2.setValueAttribute(temail.getText());
-                    _pin.setValueAttribute(tsid.getText());
-                    _stype.setSelectedAttribute("hash", true);
-                    _hash.setValueAttribute(hashList[i]);                    //testing hash: E28ADC9EA142DB02FC2978D3D42E2F2F
-                    if (tseverity.isSelected()) { _severity.setAttribute("checked", "checked"); }
+                    FIRST_NAME.setValueAttribute(tfname.getText());
+                    LAST_NAME.setValueAttribute(tlname.getText());
+                    COMPANY_NAME.setValueAttribute(tcname.getText());
+                    EMAIL.setValueAttribute(temail.getText());
+                    EMAIL2.setValueAttribute(temail.getText());
+                    PIN.setValueAttribute(tsid.getText());
+                    if (tseverity.isSelected()) {
+                        SEVERITY.setAttribute("checked", "checked");
+                    }
+                    TYPE.setSelectedAttribute("hash", true);
+                for (int i = 0; i < hashList.length; i++) {
+                    HASH.setValueAttribute(hashList[i]);                    //testing hash: E28ADC9EA142DB02FC2978D3D42E2F2F
 
 
                     /*Test if the website has received correct form value
-                    System.out.println(_firstName.getValueAttribute());
-                    System.out.println(_lastName.getValueAttribute());
-                    System.out.println(_companyName.getValueAttribute());
-                    System.out.println(_email.getValueAttribute());
-                    System.out.println(_pin.getValueAttribute());
-                    System.out.println(_stype.getSelectedOptions());
-                    System.out.println(_severity.getValueAttribute());
-                    System.out.println(_hash.getValueAttribute());
+                    System.out.println(FIRST_NAME.getValueAttribute());
+                    System.out.println(LAST_NAME.getValueAttribute());
+                    System.out.println(COMPANY_NAME.getValueAttribute());
+                    System.out.println(EMAIL.getValueAttribute());
+                    System.out.println(PIN.getValueAttribute());
+                    System.out.println(TYPE.getSelectedOptions());
+                    System.out.println(SEVERITY.getValueAttribute());
+                    System.out.println(HASH.getValueAttribute());
                     */
 
                     //Submit Form and retrieve info
                     HtmlPage nextPage = null;
                     try {
-                        nextPage = submit.click();
+                        nextPage = SUBMIT.click();
                         nextPageContent = nextPage.asXml();
                         String[] htmlStr = nextPageContent.split("Tracking Number: ");
                         String[] htmlStr2 = htmlStr[1].split("\n" +
                                 "          </b>");
                         trackingNumber[i] = htmlStr2[0];
-//                        tout.setText(getFormInfo() + "Tracking number(s): \n" + getAllTrackingNum(trackingNumber));
                         tout.setText("Tracking number(s): \n" + getAllTrackingNum(trackingNumber));
-                        //                        System.out.println("Tracking Number: " + trackingNumber[i]);
-
                         sentCount++;
                     } catch (Exception e2) {
                         e2.printStackTrace();
-                        JOptionPane.showMessageDialog(c, "Error occurred: invalid information.");
+                        JOptionPane.showMessageDialog(c, "Error: invalid information.");
                     }
+
+//                    long endTime = System.nanoTime();
+//                    System.out.println((endTime - startTime)/1000000000.0);
                 }
                 if (trackingNumber[0] != null) {
                     allResult = trackingNumber;
 //                    System.out.println(getAllTrackingNum(trackingNumber));
                     resultToClipboard(trackingNumber);
                     JOptionPane.showMessageDialog(c, "Completed. \nAll tracking numbers are copied.");
-                    copy.setVisible(true);
+//                    copy.setVisible(true);
+                    copy.setEnabled(true);
                 }
-            }
-            else {
+            } else {
                 tout.setText("");
-                JOptionPane.showMessageDialog(c,"Error occurred: incorrect information.", "Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(c, "Error: incorrect information.", "Error", JOptionPane.WARNING_MESSAGE);
             }
             changeFieldStatus(true);
-        }
-        else if (event.getSource() == reset) {
+
+            //runtime test
+
+
+        } else if (event.getSource() == reset) {
             reset();
-//            JFrame newFrame = new JFrame("New Window");
-//            newFrame.pack();
-//            newFrame.setVisible(true);
-//            newFrame.setSize(500,500);
-//            newFrame.setLocationRelativeTo(null);
-        }
-        else if (event.getSource() == copy) {
+        } else if (event.getSource() == copy) {
             resultToClipboard(allResult);
             JOptionPane.showMessageDialog(c, "Tracking Numbers are copied.");
+        } else if (event.getSource() == setHash) {
+            hashImporter.setVisible(true);
+        }
+    }
+}
+
+class HashImporter
+        extends JFrame
+        implements ActionListener{
+    private Container c;
+    private JTextArea type;
+    private JLabel title;
+    private JButton set;
+    private JButton cancel;
+    private String[] allInputs;
+    private String[] hash;
+    private Boolean isCorrectHash = false;
+    private String savedData;
+
+    public HashImporter() {
+        setSize(350,530);
+        setLocationRelativeTo(null);
+        setResizable(true);
+
+        c = getContentPane();
+        c.setLayout(null);
+
+        title = new JLabel("Enter one MD5 hash per line:");
+        title.setFont(new Font("Arial", Font.PLAIN, 15));
+        title.setSize(300, 15);
+        title.setLocation(12, 15);
+        c.add(title);
+
+        type = new JTextArea();
+        type.setFont(new Font("Arial", Font.PLAIN, 14));
+        type.setLineWrap(true);
+        JScrollPane inputScroll = new JScrollPane(type);
+        inputScroll.setBounds(10, 40, 330, 430);
+        inputScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        c.add(inputScroll);
+
+        set = new JButton("Import");
+        set.setFont(new Font("Arial", Font.PLAIN, 14));
+        set.setBounds(10, 480,160, 20);
+        set.addActionListener(this);
+        c.add(set);
+
+
+        cancel = new JButton("Cancel");
+        cancel.setFont(new Font("Arial", Font.PLAIN, 14));
+        cancel.setBounds(180, 480,160, 20);
+        cancel.addActionListener(this);
+        c.add(cancel);
+    }
+
+    public void reset() {
+        String clear = "";
+        type.setText(clear);
+        type.setEditable(true);
+    }
+
+    public String[] getHash() {
+        return hash;
+    }
+
+    public void actionPerformed(ActionEvent event){
+        if (event.getSource() == set) {
+            String typeInput = type.getText();
+            allInputs = typeInput.split("\\n");
+
+            for (String s: allInputs) {
+                s = s.trim();
+                isCorrectHash = (s.matches("[a-zA-Z0-9]*") && s.length() == 32) ? true : false;
+                if (isCorrectHash == false) {
+                    break;
+                }
+            }
+
+            if (isCorrectHash) {
+                hash = new String[allInputs.length];
+                for (int i=0; i < allInputs.length; i++) {
+                    hash[i] = allInputs[i].trim();
+                }
+                allInputs = null;
+                savedData = type.getText();
+                dispose();
+            }
+            else {
+                JOptionPane.showMessageDialog(c, "Error: Incorrect MD5 format.", "Error", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+        else if (event.getSource() == cancel){
+            dispose();
+            type.setText(savedData);
         }
     }
 }
