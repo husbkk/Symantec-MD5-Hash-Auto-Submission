@@ -1,7 +1,7 @@
 # Symantec-MD5-Hash-Auto-Submission
 
 This program created after my resignation at HKBEA aims to help colleagues in Deskside Support Team. 
-Its purpose is to fill in the form on the Synmantec website for the suspected infected file examination request and to retrieve the corresponding tracking number automatically. Be noted that this only works when the website does not contain captcha validation.
+Its purpose is to fill in the form on the Synmantec website for the suspected infected file examination request and to retrieve the corresponding tracking number automatically. Be noted that this only works when there does not contain captcha validation.
 
 This hardcoded program only works on the website: Symantec - Upload a suspected infected file (BCS).
 URL: https://submit.symantec.com/websubmit/bcs.cgi
