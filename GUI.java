@@ -1,4 +1,3 @@
-
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
@@ -11,9 +10,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 
 
-class MyFrame
-        extends JFrame
-        implements ActionListener {
+class MyFrame extends JFrame implements ActionListener {
 
     private Container c;
     private JLabel title;
@@ -35,11 +32,8 @@ class MyFrame
     private JButton setHash;
     private JTextArea tout;
     private String[] allResult = null;
-    private JProgressBar progressBar;
-    private int sentCount = 0;
     private String[] hashList = null;
     private HashImporter hashImporter;
-//    private ProgressIn
 
     public MyFrame() {
         setTitle("MD5 Auto Submission Bot");
@@ -140,16 +134,15 @@ class MyFrame
         copy = new JButton("Copy Result");
         copy.setFont(new Font("Arial", Font.PLAIN, 14));
         copy.setSize(145, 20);
-        copy.setLocation(185, 240); //185 230
+        copy.setLocation(185, 240);
         copy.addActionListener(this);
-//        copy.setVisible(false);
         copy.setEnabled(false);
         c.add(copy);
 
         sub = new JButton("Submit");
         sub.setFont(new Font("Arial", Font.PLAIN, 14));
         sub.setSize(145, 20);
-        sub.setLocation(30, 270);       //30 260
+        sub.setLocation(30, 270);
         sub.addActionListener(this);
         c.add(sub);
 
@@ -165,26 +158,15 @@ class MyFrame
         tout.setLineWrap(true);
         tout.setEditable(false);
         JScrollPane outputScroll = new JScrollPane(tout);
-        outputScroll.setBounds(350,20, 300, 273);   //350,20,300,400 (243)
+        outputScroll.setBounds(350,20, 300, 273);
         outputScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-//        tout.setSize(300, 400);
-//        tout.setLocation(500, 100);
-//        tout.setLineWrap(true);
-//        tout.setEditable(false);
         c.add(outputScroll);
 
-        progressBar = new JProgressBar();
-        progressBar.setValue(0);
-        progressBar.setStringPainted(true);
-        progressBar.setBounds(350,20,300,20);
-        c.add(progressBar);
-
         hashImporter = new HashImporter();
-
         setVisible(true);
     }
 
-    public Boolean formIsValid() {
+    public Boolean isValidForm() {
         String email = temail.getText();
         boolean emailIsValid = (email.contains("@") && email.contains(".") && !email.contains(" ")) ? true : false;
         if (!tfname.getText().isEmpty()
@@ -197,6 +179,7 @@ class MyFrame
         return false;
     }
 
+    /*
     public String getFormInfo() {
         boolean checkSeverity = (tseverity.isSelected()) ? true : false;
         String data
@@ -208,6 +191,7 @@ class MyFrame
                 + "High Severity: " + checkSeverity + "\n";
         return data;
     }
+    */
 
     public String getAllTrackingNum(String[] arr) {
         String data = "";
@@ -217,7 +201,6 @@ class MyFrame
         return data;
     }
 
-// start optional merge
     public HtmlPage retrievePage(String url) {
         WebClient webclient = new WebClient(BrowserVersion.CHROME);
 
@@ -240,13 +223,12 @@ class MyFrame
     }
 
     public void changeFieldStatus(Boolean status) {
-            tfname.setEditable(status);
-            tlname.setEditable(status);
-            tcname.setEditable(status);
-            temail.setEditable(status);
-            tsid.setEditable(status);
-            tseverity.setEnabled(status);
-//            type.setEditable(status);
+        tfname.setEditable(status);
+        tlname.setEditable(status);
+        tcname.setEditable(status);
+        temail.setEditable(status);
+        tsid.setEditable(status);
+        tseverity.setEnabled(status);
     }
 
     public void resultToClipboard(String[] arr) {
@@ -266,18 +248,6 @@ class MyFrame
         hashImporter.reset();
     }
 
-    public int getSentCount() {
-        return sentCount;
-    }
-
-    public void initiateProgress() {
-        while (sentCount != 100) {
-            int sent = getSentCount();
-            progressBar.setValue(sent);
-
-        }
-    }
-
     public void actionPerformed(ActionEvent event) {
         String[] trackingNumber;
 
@@ -288,41 +258,40 @@ class MyFrame
 //            long startTime = System.nanoTime();
             //
             changeFieldStatus(false);
-//            initiateProgress();
+
 
             hashList = hashImporter.getHash();
-            trackingNumber =  new String[hashList.length];
-            if (formIsValid()) {
-//                System.out.println("Programme Running. Please Wait.");
-//                for (int i = 0; i < hashList.length; i++) {
+
+            if (isValidForm()) {
 //                    System.out.println(getFormInfo());
 
-                    final HtmlPage htmlPage = retrievePage("https://submit.symantec.com/websubmit/bcs.cgi");
+                trackingNumber =  new String[hashList.length];
+                final HtmlPage htmlPage = retrievePage("https://submit.symantec.com/websubmit/bcs.cgi");
 
-                    //Get HTML elements
-                    final HtmlForm FORM = htmlPage.getFormByName("appform");
-                    final HtmlTextInput FIRST_NAME = FORM.getInputByName("fname");
-                    final HtmlTextInput LAST_NAME = FORM.getInputByName("lname");
-                    final HtmlTextInput COMPANY_NAME = FORM.getInputByName("cname");
-                    final HtmlTextInput EMAIL = FORM.getInputByName("email");
-                    final HtmlTextInput EMAIL2 = FORM.getInputByName("email2");        //confirmation email
-                    final HtmlTextInput PIN = FORM.getInputByName("pin");
-                    final HtmlSelect TYPE = FORM.getSelectByName("stype");
-                    final HtmlTextInput HASH = FORM.getInputByName("hash");
-                    final HtmlCheckBoxInput SEVERITY = FORM.getInputByName("critical");
-                    final HtmlSubmitInput SUBMIT = FORM.getInputByValue("Submit");
+                //Get HTML elements
+                final HtmlForm FORM = htmlPage.getFormByName("appform");
+                final HtmlTextInput FIRST_NAME = FORM.getInputByName("fname");
+                final HtmlTextInput LAST_NAME = FORM.getInputByName("lname");
+                final HtmlTextInput COMPANY_NAME = FORM.getInputByName("cname");
+                final HtmlTextInput EMAIL = FORM.getInputByName("email");
+                final HtmlTextInput EMAIL2 = FORM.getInputByName("email2");        //confirmation email
+                final HtmlTextInput PIN = FORM.getInputByName("pin");
+                final HtmlSelect TYPE = FORM.getSelectByName("stype");
+                final HtmlTextInput HASH = FORM.getInputByName("hash");
+                final HtmlCheckBoxInput SEVERITY = FORM.getInputByName("critical");
+                final HtmlSubmitInput SUBMIT = FORM.getInputByValue("Submit");
 
-                    //Set value to fields of website accordingly
-                    FIRST_NAME.setValueAttribute(tfname.getText());
-                    LAST_NAME.setValueAttribute(tlname.getText());
-                    COMPANY_NAME.setValueAttribute(tcname.getText());
-                    EMAIL.setValueAttribute(temail.getText());
-                    EMAIL2.setValueAttribute(temail.getText());
-                    PIN.setValueAttribute(tsid.getText());
-                    if (tseverity.isSelected()) {
-                        SEVERITY.setAttribute("checked", "checked");
-                    }
-                    TYPE.setSelectedAttribute("hash", true);
+                //Set value to fields of website accordingly
+                FIRST_NAME.setValueAttribute(tfname.getText());
+                LAST_NAME.setValueAttribute(tlname.getText());
+                COMPANY_NAME.setValueAttribute(tcname.getText());
+                EMAIL.setValueAttribute(temail.getText());
+                EMAIL2.setValueAttribute(temail.getText());
+                PIN.setValueAttribute(tsid.getText());
+                if (tseverity.isSelected()) {
+                    SEVERITY.setAttribute("checked", "checked");
+                }
+                TYPE.setSelectedAttribute("hash", true);
                 for (int i = 0; i < hashList.length; i++) {
                     HASH.setValueAttribute(hashList[i]);                    //testing hash: E28ADC9EA142DB02FC2978D3D42E2F2F
 
@@ -347,8 +316,6 @@ class MyFrame
                         String[] htmlStr2 = htmlStr[1].split("\n" +
                                 "          </b>");
                         trackingNumber[i] = htmlStr2[0];
-                        tout.setText("Tracking number(s): \n" + getAllTrackingNum(trackingNumber));
-                        sentCount++;
                     } catch (Exception e2) {
                         e2.printStackTrace();
                         JOptionPane.showMessageDialog(c, "Error: invalid information.");
@@ -361,19 +328,15 @@ class MyFrame
                     allResult = trackingNumber;
 //                    System.out.println(getAllTrackingNum(trackingNumber));
                     resultToClipboard(trackingNumber);
-                    JOptionPane.showMessageDialog(c, "Completed. \nAll tracking numbers are copied.");
-//                    copy.setVisible(true);
+                    tout.setText("Tracking number(s): \n" + getAllTrackingNum(trackingNumber));
                     copy.setEnabled(true);
+                    JOptionPane.showMessageDialog(c, "Completed. \nAll tracking numbers are copied.");
                 }
             } else {
                 tout.setText("");
                 JOptionPane.showMessageDialog(c, "Error: incorrect information.", "Error", JOptionPane.WARNING_MESSAGE);
             }
             changeFieldStatus(true);
-
-            //runtime test
-
-
         } else if (event.getSource() == reset) {
             reset();
         } else if (event.getSource() == copy) {
@@ -385,9 +348,8 @@ class MyFrame
     }
 }
 
-class HashImporter
-        extends JFrame
-        implements ActionListener{
+class HashImporter extends JFrame implements ActionListener{
+
     private Container c;
     private JTextArea type;
     private JLabel title;
@@ -425,7 +387,6 @@ class HashImporter
         set.setBounds(10, 480,160, 20);
         set.addActionListener(this);
         c.add(set);
-
 
         cancel = new JButton("Cancel");
         cancel.setFont(new Font("Arial", Font.PLAIN, 14));
