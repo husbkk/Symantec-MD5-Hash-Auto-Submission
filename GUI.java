@@ -266,10 +266,10 @@ class MyFrame extends JFrame implements ActionListener {
 //                    System.out.println(getFormInfo());
 
                 trackingNumber =  new String[hashList.length];
-                final HtmlPage htmlPage = retrievePage("https://submit.symantec.com/websubmit/bcs.cgi");
+                final HtmlPage HTML_PAGE = retrievePage("https://submit.symantec.com/websubmit/bcs.cgi");
 
                 //Get HTML elements
-                final HtmlForm FORM = htmlPage.getFormByName("appform");
+                final HtmlForm FORM = HTML_PAGE.getFormByName("appform");
                 final HtmlTextInput FIRST_NAME = FORM.getInputByName("fname");
                 final HtmlTextInput LAST_NAME = FORM.getInputByName("lname");
                 final HtmlTextInput COMPANY_NAME = FORM.getInputByName("cname");
