@@ -13,8 +13,8 @@ The bot with absolute correctness was written quickly in roughly 2 days. Therefo
 12 Feb update: Import Hash function created. MD5 format will be checked. Trailing space will be omitted.
 
 There are 2 ways to run this program. 
-1) Download the bot along with bat file of the corresponding version. 
-   Click on bat file to open.
+1) Download the bot along with bat/exe file of the corresponding version. 
+   Click on bat/exe file to open.
    
 2) Open cmd.exe / terminal.
    Go to the directory which holds MD5_Bot_Java(Version).jar
